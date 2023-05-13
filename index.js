@@ -2,7 +2,10 @@ require('console.table');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const {
-    findEmployees
+    findEmployees,
+    findRoles,
+    findDepartment,
+    createDepartment
 } = require('./db')
 
 const mainQuestion = ([
@@ -10,7 +13,7 @@ const mainQuestion = ([
         message: 'What would you like to do?',
         type: 'list',
         name: 'navigation',
-        choices: ['View all employees', 'Add employee', 'Update employee role', 'View all roles', 'Add role', 'View all departments', 'Add department']
+        choices: ['View all employees', 'Add employee', 'Update employee role', 'View all roles', 'Add a role', 'View all departments', 'Add a department']
     }
 ]);
 
@@ -56,7 +59,90 @@ inquirer.prompt(addEmployeeQuestions)
     .then (() => initialQuestion())
 })
 })
-}
+};
+
+function addRole() {
+    findRoles()
+    .then(([roleData]) => {
+        console.log(roleData)
+const deptChoices = roleData.map(eachDept => ({
+    title: eachDept.name,
+    value: department.id
+}))
+
+console.log(deptChoices)
+
+const addRoleQuestions = ([
+    {
+        message: 'What is the title of the role?',
+        type: 'input',
+        name: 'title',
+    },
+    {
+        message: 'What is the salary?',
+        type: 'input',
+        name: 'salary'
+    },
+    {
+        message: 'What is the department?',
+        type: 'list',
+        choices: deptChoices,
+        name: 'department_id'
+    }
+])
+inquirer.prompt(addRoleQuestions)
+.then((answers) => {
+    console.log(answers)
+    createRole(answers)
+    .then (() => initialQuestion())
+})
+})
+};
+
+function addDepartment() {
+    findDepartment()
+    .then(([deptData]) => {
+        console.log(deptData)
+
+const addDeptQuestions = ([
+    {
+        message: 'What is the name of the department?',
+        type: 'input',
+        name: 'name',
+    }
+])
+inquirer.prompt(addDeptQuestions)
+.then((answers) => {
+    console.log(answers)
+    createDepartment(answers)
+    .then (() => initialQuestion())
+})
+})
+};
+
+function viewEmployees() {
+    findEmployees()
+    .then(([employeeData]) => {
+        console.log(employeeData)
+    initialQuestion()
+})
+};
+
+function viewRoles() {
+    findRoles()
+    .then(([roleData]) => {
+        console.log(roleData)
+    initialQuestion()
+})
+};
+
+function viewDepartments() {
+    findDepartment()
+    .then(([departmentData]) => {
+        console.log(departmentData)
+    initialQuestion()
+})
+};
 
 function initialQuestion() {
     inquirer.prompt(mainQuestion)
@@ -68,9 +154,21 @@ function initialQuestion() {
             case "Add employee":
                 addEmployee();
                 break;
-            case "":
-
-            break
+            case "Update employee role":
+                updateEmployee();
+            break;
+            case "View all roles":
+                viewRoles();
+            break;
+            case "Add a role":
+                addRole();
+            break;
+            case "View all departments":
+                viewDepartments();
+            break;
+            case "Add a department":
+                addDepartment();
+            break;
         }
     })
 };
