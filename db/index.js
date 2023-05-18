@@ -1,5 +1,5 @@
 const { createPromptModule } = require('inquirer');
-const connection = require('./connection')
+const connection = require('./connection');
 
 module.exports = {
     findEmployees() {
